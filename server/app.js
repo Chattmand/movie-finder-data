@@ -6,48 +6,30 @@
 
 var express = require('express');
 const axios = require('axios');
+const morgan = require('morgan');
 var titleQueries = {}
-var idQueries = {}
-//for (let i =0; i < 0; i++){
-    
-//}
 
+//napp.use(morgan('dev'))
 var app = express();
 app.get('/', (req, res)=>{
     let path = req.url
-    console.log(path)
-    var movieTitle = req.query.t;
-    var movieId = req.query.i;
-    if (movieId != undefined){
-        if(idQueries[movieId] != undefined){
-            res.send(idQueries[movieId])
-        } 
-        // else {
-        //     axios.get('https://www.omdbapi.com/?i=' + movieId + '&apikey=85f9dc34')
-        //         .then(function (response) {
-        //             res.send(response.data) 
-        //             //console.log(response);
-        //             idQueries[movieId] = response.data
-        //         });
-                
-        // }
+    if (path === '/'){
+        res.send('Hello')
     }
-    // else if(movieTitle != undefined){
-    //     if (titleQueries[movieTitle] != undefined){
-    //         res.send(titleQueries[movieTitle])
-    //     }
-    //     else {
-    //         axios.get('https://www.omdbapi.com/?t=' + movieTitle + '&apikey=85f9dc34')
-    //             .then(function (response) {
-    //                 res.send(response.data) 
-    //                // console.log(response);
-    //                 titleQueries[movieTitle] = response.data
-    //             });
-    //     }
-    // }
-    //res.send(req.query)
-
-
+    if(titleQueries[path]){
+        console.log('getting movie from titleQueries')
+        return res.json(titleQueries[path])
+    }
+    axios
+    .get('https://www.omdbapi.com' + path + '&apikey=85f9dc34')
+    .then(function (response) {
+        var data = response.data
+        titleQueries[path] = data
+        res.status(200).json(data)
+    })
+    .catch(function(error){
+        res.status(200).json(error.message)
+    })
     
 });
 
